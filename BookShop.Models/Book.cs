@@ -8,7 +8,7 @@
         public int? Copies { get; set; }
         public string? Description { get; set; }
         public string? EditionType { get; set; }
-        public int? Price { get; set; }
+        public decimal? Price { get; set; }
         public DateTime? ReleaseDate { get; set; }
         public string? Title { get; set; }
 

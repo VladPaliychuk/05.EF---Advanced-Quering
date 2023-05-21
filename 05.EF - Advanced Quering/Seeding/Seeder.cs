@@ -6,18 +6,18 @@ namespace _05.EF___Advanced_Quering.Seeding
 {
     public static class Seeder
     {
-        static Seeder()
-        {
-            if (Authors is null && Books is null && BookCategories is null && Categories is null)
-            {
-                InitializeData();
-            }
-        }
-
         public static List<Author> Authors { get; set; } = null!;
         public static List<Book> Books { get; set; } = null!;
         public static List<BookCategory> BookCategories { get; set; } = null!;
         public static List<Category> Categories { get; set; } = null!;
+
+        static Seeder()
+        {
+            if (Authors is null && Books is null && Categories is null && BookCategories is null)
+            {
+                InitializeData();
+            }
+        }
 
         private static void InitializeData()
         {
@@ -36,10 +36,11 @@ namespace _05.EF___Advanced_Quering.Seeding
             BookCategories.AddRange(bookCategories);
             Categories.AddRange(categories);*/
 
-            //Authors = GetAuthorGenerator().Generate(5);
+            Authors = GetAuthorGenerator().Generate(5);
             Books = GetBookGenerator().Generate(5);
             BookCategories = GetBookCategoryGenerator().Generate(7);
-            //Categories = GetCategoryGenerator().Generate(10);
+            //BookCategories = GetBookCategoryGenerator().Generate(5).Distinct().ToList();
+            Categories = GetCategoryGenerator().Generate(10);
         }
 
         private static Faker<Author> GetAuthorGenerator()
@@ -53,11 +54,11 @@ namespace _05.EF___Advanced_Quering.Seeding
         {
             return new Faker<Book>()
                 .RuleFor(b => b.BookId, f => Guid.NewGuid())
-                .RuleFor(b => b.Title, f => f.Random.Words())
-                .RuleFor(b => b.Description, f => f.Lorem.Text())
-                .RuleFor(b => b.ReleaseDate, f => f.Date.Past(5))
-                .RuleFor(b => b.Copies, f => f.Random.Int(1, 100))
-                .RuleFor(b => b.Price, f => f.Random.Int(5, 300))
+                .RuleFor(b => b.Title, f => f.Lorem.Word())
+                .RuleFor(b => b.Description, f => f.Lorem.Paragraph())
+                .RuleFor(b => b.ReleaseDate, f => f.Date.Past(15))
+                .RuleFor(b => b.Copies, f => f.Random.Int(1, 1000))
+                .RuleFor(b => b.Price, f => f.Random.Decimal(5, 300))
                 .RuleFor(b => b.EditionType, f => f.Random.Enum<EditionType>().ToString())
                 .RuleFor(b => b.AgeRestriction, f => f.Random.Enum<AgeRestriction>().ToString())
                 .RuleFor(b => b.AuthorId, f => f.PickRandom(Authors).AuthorId);
