@@ -1,4 +1,4 @@
-﻿using _05.EF___Advanced_Quering.Configurations;
+﻿using BookShop.Data.Configurations;
 using BookShop.Models;
 using Microsoft.EntityFrameworkCore;
 

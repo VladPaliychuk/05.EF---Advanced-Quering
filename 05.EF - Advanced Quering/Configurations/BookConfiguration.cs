@@ -1,14 +1,9 @@
 ﻿using BookShop.Models;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using _05.EF___Advanced_Quering.Seeding;
+using BookShop.Data.Seeding;
 
-namespace _05.EF___Advanced_Quering.Configurations
+namespace BookShop.Data.Configurations
 {
     public class BookConfiguration : IEntityTypeConfiguration<Book>
     {
@@ -23,9 +18,6 @@ namespace _05.EF___Advanced_Quering.Configurations
             builder.Property(b => b.Description)
                 .HasMaxLength(1000)
                 .IsUnicode(true);
-
-            builder.Property(b => b.ReleaseDate)
-                .IsRequired(false);
 
             builder.Property(b => b.EditionType)
                 .IsRequired();
