@@ -13,18 +13,15 @@ var context = new BookShopContext(options);
 
 var repository = new BookShopRepository(context);
 
-Console.WriteLine("Welcome to Book shop!");
+Console.Write("Query (exit to close app): ");
+string n = Console.ReadLine();
 
-Console.Write("Input number to start specific query (EXIT to close app): ");
-string queryNumber = Console.ReadLine();
-
-while (queryNumber is not "EXIT")
+while (n is not "exit")
 {
-    switch (queryNumber)
+    switch (n)
     {
         case "1":
 
-            Console.WriteLine();
             Console.Write("Age restriction (Minor, Teen, Adult): ");
             string input = Console.ReadLine();
 
@@ -116,35 +113,27 @@ while (queryNumber is not "EXIT")
         case "8":
 
             Console.WriteLine();
-            Console.Write("Title name contains (Titlename): ");
+            Console.Write("Title contains : ");
             string titleName = Console.ReadLine();
-            var result8 = await repository.GetBookTitlesContaining(titleName);
+            var r8 = await repository.GetBookTitlesContaining(titleName);
 
-            for (int i = 0; i < result8.Count; i++)
+            foreach(var item in r8)
             {
-                Console.WriteLine();
-                Console.ForegroundColor = ConsoleColor.Green;
-                Console.WriteLine($"{result8[i]}");
-                Console.ResetColor();
+                Console.WriteLine(item);
             }
-
             break;
 
         case "9":
 
             Console.WriteLine();
-            Console.Write("Author Lastname starts with (Lastname): ");
+            Console.Write("Author Lastname starts with (example: Kil): ");
             string lastname = Console.ReadLine();
-            var result9 = await repository.GetBooksByAuthor(lastname);
+            var r9 = await repository.GetBooksByAuthor(lastname);
 
-            for (int i = 0; i < result9.Count; i++)
+            foreach(var item in r9)
             {
-                Console.WriteLine();
-                Console.ForegroundColor = ConsoleColor.Green;
-                Console.WriteLine($"{result9[i]}");
-                Console.ResetColor();
+                Console.WriteLine(item);
             }
-
             break;
 
         case "10":
@@ -152,26 +141,20 @@ while (queryNumber is not "EXIT")
             Console.WriteLine();
             Console.Write("Length: ");
             string length = Console.ReadLine();
-            var result10 = await repository.CountBooks(Convert.ToInt32(length));
+            var r10 = await repository.CountBooks(Convert.ToInt32(length));
 
-            Console.WriteLine();
-            Console.ForegroundColor = ConsoleColor.Green;
-            Console.WriteLine($"There are {result10} books with longer title than {length} symbols");
-            Console.ResetColor();
+            Console.WriteLine($"There are {r10} books with longer title than {length} symbols");
 
             break;
 
         case "11":
 
             Console.WriteLine();
-            var result11 = await repository.CountCopiesByAuthor();
+            var r11 = await repository.CountCopiesByAuthor();
 
-            for (int i = 0; i < result11.Count; i++)
+            foreach(var item in r11)
             {
-                Console.WriteLine();
-                Console.ForegroundColor = ConsoleColor.Green;
-                Console.WriteLine($"{result11[i]}");
-                Console.ResetColor();
+                Console.WriteLine(item);
             }
 
             break;
@@ -179,40 +162,29 @@ while (queryNumber is not "EXIT")
         case "12":
 
             Console.WriteLine();
-            var result12 = await repository.GetTotalProfitByCategory();
+            var r12 = await repository.GetTotalProfitByCategory();
 
-            for (int i = 0; i < result12.Count; i++)
+            foreach(var item in r12)
             {
-                Console.WriteLine();
-                Console.ForegroundColor = ConsoleColor.Green;
-                Console.WriteLine($"{result12[i]}");
-                Console.ResetColor();
+                Console.WriteLine(item);
             }
-
             break;
 
         case "13":
 
             Console.WriteLine();
-            var result13 = await repository.GetMostRecentBooks();
+            var r13 = await repository.GetMostRecentBooks();
 
-            for (int i = 0; i < result13.Count; i++)
+            foreach(var item in r13)
             {
-                Console.WriteLine();
-                Console.ForegroundColor = ConsoleColor.Green;
-                Console.WriteLine($"{result13[i]}");
-                Console.ResetColor();
+                Console.WriteLine(item);
             }
-
             break;
 
         case "14":
 
-            Console.WriteLine();
             await repository.IncreasePrices();
-
             Console.WriteLine("Done!");
-
             break;
 
         case "15":
@@ -220,24 +192,13 @@ while (queryNumber is not "EXIT")
             Console.WriteLine();
             var result15 = await repository.RemoveBooks();
 
-            Console.ForegroundColor = ConsoleColor.Red;
-            Console.WriteLine();
             Console.WriteLine($"Books deleted: {result15}");
-            Console.ResetColor();
-
             break;
 
         default:
-
-            Console.ForegroundColor = ConsoleColor.Red;
-            Console.WriteLine();
-            Console.WriteLine("Wrong query number!");
-            Console.ResetColor();
-
+            Console.WriteLine("\n");
             break;
     }
-
-    Console.WriteLine();
-    Console.Write("Input number to start specific query (EXIT to close app): ");
-    queryNumber = Console.ReadLine();
+    Console.Write("\nQuery (exit to close app): ");
+    n = Console.ReadLine();
 }

@@ -161,19 +161,13 @@ namespace _05.EF___Advanced_Quering
                 .AsNoTracking()
                 .ToListAsync();
 
-            var bookTitles = new List<string>();
-
-            foreach (var book in books)
-            {
-                bookTitles.Add(book.Title);
-            }
-
             var result = new List<string>();
-
-            foreach (var bookTitle in bookTitles)
+            foreach(var book in books)
             {
-                if (bookTitle.Contains(input))
-                    result.Add(bookTitle);
+                if (book.Title.Contains(input))
+                {
+                    result.Add(book.Title.ToString());
+                }
             }
 
             if (result is not null) { return result.ToList(); }
@@ -189,20 +183,20 @@ namespace _05.EF___Advanced_Quering
                 .AsNoTracking()
                 .ToListAsync();
 
-            var allBooks = await _context
+            var books = await _context
                 .Books
                 .AsNoTracking()
                 .ToListAsync();
 
             var result = new List<string>();
 
-            for (int i = 0; i < allBooks.Count; i++)
+            foreach(var book in books)
             {
-                for (int j = 0; j < authors.Count; j++)
+                foreach(var author in authors)
                 {
-                    if (allBooks[i].AuthorId == authors[j].AuthorId)
+                    if (book.AuthorId == author.AuthorId)
                     {
-                        result.Add($"{allBooks[i].Title} - {authors[j].FirstName} {authors[j].LastName}");
+                        result.Add($"{book.Title} ({author.FirstName} {author.LastName})");
                     }
                 }
             }
@@ -239,18 +233,16 @@ namespace _05.EF___Advanced_Quering
 
             var result = new List<string>();
 
-            for (int i = 0; i < authors.Count; i++)
+            foreach(var book in books)
             {
-                int copies = 0;
-
-                for (int j = 0; j < books.Count; j++)
+                foreach(var author in authors)
                 {
-                    if (authors[i].AuthorId == books[j].AuthorId)
-                    {
-                        copies += books[j].Copies;
+                    int copies = 0;
+                    if (book.AuthorId == author.AuthorId)
+                        copies = +book.Copies;
 
-                        result.Add($"{authors[j].FirstName} {authors[j].LastName} - {copies}");
-                    }
+                    if (copies != 0) 
+                        result.Add($"{author.FirstName} {author.LastName} - {copies}");copies = 0;
                 }
             }
 
@@ -261,8 +253,8 @@ namespace _05.EF___Advanced_Quering
         // -12-
         public async Task<List<string>> GetTotalProfitByCategory()
         {
-            var bookCategories = await _context
-                .BookCategories
+            var categories = await _context
+                .Categories
                 .AsNoTracking()
                 .ToListAsync();
 
@@ -271,26 +263,28 @@ namespace _05.EF___Advanced_Quering
                 .AsNoTracking()
                 .ToListAsync();
 
+            var bookCategories = await _context
+                .BookCategories
+                .AsNoTracking()
+                .ToListAsync();
+
             var result = new List<string>();
 
-            for (int i = 0; i < bookCategories.Count; i++)
+            foreach (var bc in bookCategories)
             {
-                decimal totalPrice = 0;
-
-                var categoryName = await _context
-                    .Categories
-                    .AsNoTracking()
-                    .Where(c => c.CategoryId == bookCategories[i].CategoryId)
-                    .Select(c => c.Name)
-                    .FirstOrDefaultAsync();
-
-                for (int j = 0; j < books.Count; j++)
+                foreach (var category in categories)
                 {
-                    if (bookCategories[i].BookId == books[j].BookId)
+                    if (category.CategoryId == bc.CategoryId)
                     {
-                        totalPrice += books[j].Price;
-
-                        result.Add($"{categoryName} - {totalPrice}$");
+                        decimal value = 0;
+                        foreach (var book in books)
+                            if (book.BookId == bc.BookId)
+                            {
+                                decimal c = new decimal(book.Copies);
+                                decimal p = book.Price;
+                                value += p * c;
+                            }
+                        result.Add($"{category.Name} ${value}");
                     }
                 }
             }
@@ -315,27 +309,27 @@ namespace _05.EF___Advanced_Quering
 
             var result = new List<string>();
 
-            for (int i = 0; i < bookCategories.Count; i++)
+            foreach(var bc in bookCategories)
             {
                 var category = await _context
                     .Categories
                     .AsNoTracking()
-                    .Where(c => c.CategoryId == bookCategories[i].CategoryId)
+                    .Where(c => c.CategoryId == bc.CategoryId)
                     .FirstOrDefaultAsync();
 
                 var mostRecentBooks = await _context
                     .Books
                     .AsNoTracking()
-                    .Where(b => b.BookId == bookCategories[i].BookId)
+                    .Where(b => b.BookId == bc.BookId)
                     .OrderByDescending(b => b.ReleaseDate)
                     .Take(3)
                     .ToListAsync();
 
                 result.Add($"{category.Name}: ");
 
-                for (int j = 0; j < mostRecentBooks.Count; j++)
+                for (int i = 0; i < mostRecentBooks.Count; i++)
                 {
-                    result.Add($"{mostRecentBooks[j].Title} - {mostRecentBooks[j].ReleaseDate}");
+                    result.Add($"{mostRecentBooks[i].Title} - {mostRecentBooks[i].ReleaseDate}");
                 }
             }
 
@@ -348,38 +342,33 @@ namespace _05.EF___Advanced_Quering
         {
             var books = await _context
                 .Books
-                .AsNoTracking()
                 .Where(b => b.ReleaseDate.Year < 2010)
                 .ToListAsync();
 
-            if (books is not null)
-            {
-                books.ForEach(x => {
+            books?.ForEach(x => {
                     x.Price += 5;
                 });
-            }
 
             await _context.SaveChangesAsync();
         }
 
         // -15-
-        public async Task<int> RemoveBooks()
+        public async Task<List<string>> RemoveBooks()
         {
-            var books = await _context
+            var booksToDelete = await _context
                 .Books
-                .AsNoTracking()
                 .Where(b => b.Copies < 4200)
                 .ToListAsync();
 
-            var result = books.Count;
+            _context.Books.RemoveRange(booksToDelete);
 
-            var booksToDelete = await _context
-                .Books
-                .AsNoTracking()
-                .Where(b => b.Copies < 4200)
-                .ExecuteDeleteAsync();
+            var result = new List<string>();
+            foreach(var book in booksToDelete)
+            {
+                result.Add($"{book.Title} ");
+            }
 
-            if (result is not 0) { return result; }
+            if (result is not null) { return result; }
             else { throw new NullReferenceException(); }
         }
     }
